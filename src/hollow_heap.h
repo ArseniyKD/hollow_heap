@@ -245,7 +245,17 @@ hollow_heap_node< T, K >* hollow_heap< T, K >::make_node(
 // Decrease the key value of a given item and rebalance the heap as needed.
 template < class T, class K >
 void hollow_heap< T, K >::decrease_key( hollow_heap_item< T, K >* e, K k ) {
-    // Implement decrease_key from the pseudo code.
+    hollow_heap_node< T , K >* u = e->node;
+    if ( u == heap ) {
+        u->key = k;
+        return;
+    }
+    hollow_heap_node< T, K >* v = make_node( e, k );
+    u->item = nullptr;
+    if ( u->rank > 2 ) v->rank = u->rank - 2;
+    v->child = u;
+    u->ep = v;
+    heap = link( v, heap );
 }
 
 
