@@ -33,8 +33,8 @@ int main() {
     cout << "\n\n\n";
    h.dump_state();
     cout << h.find_min() << " " << h.get_size() << endl;
+    */ 
    
-   */
     h.insert( 3, 3 );
     h.insert( 4, 4 );
     h.insert( 6, 6 );
@@ -62,7 +62,7 @@ int main() {
     cout << "HELLO :)" <<endl;
     h.delete_min();
     h.dump_state();
-  
+    
 
     
    

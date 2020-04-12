@@ -67,7 +67,7 @@ class hollow_heap {
         hollow_heap_node< T, K >* make_node( T e, K k );
         hollow_heap_node< T, K >* make_node( 
                 hollow_heap_item< T, K > item, K k );
-        void add_child( 
+        hollow_heap_node< T, K >* add_child( 
                 hollow_heap_node< T, K >* v, 
                 hollow_heap_node< T, K >* w );
         int max_rank;
@@ -114,6 +114,7 @@ hollow_heap< T, K >::hollow_heap() {
     size = 0;
     max_rank = 0;
     heap = nullptr;
+    A.push_back( nullptr );
 }
 
 
@@ -172,7 +173,7 @@ void hollow_heap< T, K >::meld(
 template < class T, class K >
 T hollow_heap< T, K >::find_min() {
     if ( heap == nullptr ) { 
-        return NULL;
+        throw 0;
     }
     return heap->item->item;
 }
@@ -202,11 +203,9 @@ hollow_heap_node< T, K >* hollow_heap< T, K >::link(
         hollow_heap_node< T, K >* v,
         hollow_heap_node< T, K >* w ) {
     if ( v->key >= w->key ) {
-        add_child( v, w );
-        return w;
+        return add_child( v, w );
     } else {
-        add_child( w, v );
-        return v;
+        return add_child( w, v );
     }
 }
 
@@ -262,14 +261,12 @@ void hollow_heap< T, K >::decrease_key( hollow_heap_item< T, K >* e, K k ) {
 
 // Make a node a child of another node.
 template < class T, class K >
-void hollow_heap< T, K >::add_child( 
+hollow_heap_node<T, K>* hollow_heap< T, K >::add_child( 
         hollow_heap_node< T, K >* v,
         hollow_heap_node< T, K >* w ) {
     v->next = w->child;
     w->child = v;
-    // Implementation detail. If you try linking a node that has v as next, 
-    // it would cause you to do a double free on the next deletion.  
-    if ( w->next == v ) w->next = nullptr;
+    return w;
 }
 
 
@@ -336,6 +333,9 @@ void hollow_heap< T, K >::delete_item( hollow_heap_item< T, K >* item ){
     }
     // Set a new root from the full roots remaining.
     do_unranked_links();
+    // Without this line, your heap will no longer be a DAG. You can introduce 
+    // even the smallest cycle, which will get you forever stuck.
+    if ( heap ) heap->next = nullptr;
 }
 
 
@@ -352,6 +352,9 @@ void hollow_heap< T, K >::do_ranked_links( hollow_heap_node< T, K >* u ) {
         u = link( u, A[ u->rank ] );
         A[ u->rank ] = nullptr;
         u->rank++;
+        // Implementation detail - make sure that A has enough space to store
+        // the new full root.
+        if ( u->rank >= A.size() ) A.push_back( nullptr );
     }
     A[ u->rank ] = u;
 
