@@ -87,20 +87,21 @@ template < class T, class K >
 void hollow_heap< T, K >::dump_state() {
     hollow_heap_node< T, K >* u = heap;
     hollow_heap_node< T, K >* v;
-    std::cout << "Starting from the root" << std::endl;
+    std::cout << "Starting from the root: " << max_rank << std::endl;
     while( u ) {
-        std::cout << "   Key: " << u->key << " Value: " << u->item->item << std::endl;
+        std::cout << "   Key: " << u->key << " Value: " << u->item->item << " Next: " << u->next << " EP: " << u->ep << " Child: " << u->child << " ME: " << u <<  std::endl;
         std::cout << "   Iterating through children" << std::endl;
         v = heap->child;
         while( v ) {
-            std::cout << "       Key: " << v->key << " Value: " << v->item->item << std::endl;
+            std::cout << "       Key: " << v->key << " Value: " << v->item->item <<  " Next: " << v->next << " EP: " << v->ep << " Child: " << v->child << " ME: " << v << std::endl;
             if ( !v->next ) {
+                std::cout << "GOING TO THE NEXT CHILD" << std::endl;
                 v = v->child;
                 continue;
             }
             v = v->next;
         }
-
+        if( u->next ) std::cout << "NEXT FROM ROOT" << std::endl;
         u = u->next;
     } 
 }
@@ -266,6 +267,9 @@ void hollow_heap< T, K >::add_child(
         hollow_heap_node< T, K >* w ) {
     v->next = w->child;
     w->child = v;
+    // Implementation detail. If you try linking a node that has v as next, 
+    // it would cause you to do a double free on the next deletion.  
+    if ( w->next == v ) w->next = nullptr;
 }
 
 
