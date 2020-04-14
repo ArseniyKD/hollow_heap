@@ -49,16 +49,11 @@ vector< int > dijkstras_hh ( vector< vector< int > > adjL ) {
     vector< int > prev( 10000, -1 );
 
     dist[0] = 0;
-    //q.push( make_pair( 0, 0 ) );
     h.insert( 0, 0 );
 
     int cnt = 0;
     while( !h.is_empty() ) {
-        //h.dump_state();
         int cur = h.find_min(); h.delete_min();
-        //cout << "Size before removing: " <<  h.get_size() << endl;
-        //cout << "UHM" << endl;
-        //int cur = entry.second;
 
         if ( vis[cur] ) continue;
 
@@ -67,10 +62,8 @@ vector< int > dijkstras_hh ( vector< vector< int > > adjL ) {
             if ( i == cur ) continue;
             if ( dist[cur] + adjL[cur][i] < dist[i] ) {
                 dist[i] = dist[cur] + adjL[cur][i];
-                //cout << "i: " << i << " dist[i]:" << dist[i] << endl;
                 prev[i] = cur;
                 h.insert( i , dist[i] );
-                //cout << "Size after inserting: " << h.get_size() << endl;
             }
         }
         vis[cur] = true;
@@ -103,11 +96,20 @@ int main() {
     duration< double, milli > duration_hh = end2 - start2;
     cout << "The time to run Dijkstra's on K_10000 with hollow heap: " 
         << duration_hh.count() << " ms" << endl;
+    cout << "Hollow Heap runs " << duration_hh.count() / duration_pq.count()
+        << " times faster than the Priority Queue version." << endl;
     
-    for( int i = 0; i < res.size(); i++ ) {
-        if( res[i] != res2[i] ) {
-            cout << "Got different values: " << res[i] << " "<< res2[i] << " " << i << endl;
-        }
+    long long cst1 = 0;
+    long long cst2 = 0;
+    for ( int i = 1; i < res.size(); i++ ) {
+        cst1 += adjL[res[i]][i];
+        cst2 += adjL[res2[i]][i];
+    }
+    cout << "Cost of tree 1: " << cst1 << " Cost of tree2: " << cst2 << endl;
+    if ( cst1 == cst2 ) { 
+        cout << "Both heaps are correct in identifying shortest paths" << endl;
+    } else {
+        cout << "One of the heaps is not correct in identifying the shortest paths" << endl;
     }
 
 

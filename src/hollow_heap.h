@@ -43,7 +43,7 @@ class hollow_heap {
         // Here I have insert both for a simple item type, and an insert if 
         // someone passes in a hollow_heap_item in order to use decrease_key.
         void insert( T e, K k );
-        void insert( hollow_heap_item< T, K > item, K k );
+        void insert( hollow_heap_item< T, K >* item, K k );
         void meld( hollow_heap_node< T, K >* h, hollow_heap_node< T, K >* g );
         void decrease_key( hollow_heap_item< T, K >* e, K k );
         T find_min( );
@@ -66,7 +66,7 @@ class hollow_heap {
         // someone passes in a hollow_heap_item in order to use decrease_key.
         hollow_heap_node< T, K >* make_node( T e, K k );
         hollow_heap_node< T, K >* make_node( 
-                hollow_heap_item< T, K > item, K k );
+                hollow_heap_item< T, K >* item, K k );
         hollow_heap_node< T, K >* add_child( 
                 hollow_heap_node< T, K >* v, 
                 hollow_heap_node< T, K >* w );
@@ -93,7 +93,8 @@ void hollow_heap< T, K >::dump_state() {
         std::cout << "   Iterating through children" << std::endl;
         v = heap->child;
         while( v ) {
-            std::cout << "       Key: " << v->key << " Value: " << v->item->item <<  " Next: " << v->next << " EP: " << v->ep << " Child: " << v->child << " ME: " << v << std::endl;
+            if ( v->item ) std::cout << "       Key: " << v->key << " Value: " << v->item->item <<  " Next: " << v->next << " EP: " << v->ep << " Child: " << v->child << " ME: " << v << std::endl;
+            else std::cout << "       Key: " << v->key << " Value: " << "HOLLOW NODE" <<  " Next: " << v->next << " EP: " << v->ep << " Child: " << v->child << " ME: " << v << std::endl;
             if ( !v->next ) {
                 std::cout << "GOING TO THE NEXT CHILD" << std::endl;
                 v = v->child;
@@ -144,7 +145,7 @@ void hollow_heap< T, K >::insert( T e, K k ) {
 
 // Insert a new hollow_heap_item into the heap. Useful for decrease_key.
 template < class T, class K >
-void hollow_heap< T, K >::insert( hollow_heap_item< T, K > item, K k ) {
+void hollow_heap< T, K >::insert( hollow_heap_item< T, K >* item, K k ) {
     meld( make_node( item, k ), heap );
     size++;
 }
@@ -229,7 +230,7 @@ hollow_heap_node< T, K >* hollow_heap< T, K >::make_node( T e, K k ){
 // Create a new node given a hollow_heap_item and a key for it.
 template < class T, class K >
 hollow_heap_node< T, K >* hollow_heap< T, K >::make_node( 
-        hollow_heap_item< T, K > item, K k ) {
+        hollow_heap_item< T, K >* item, K k ) {
     hollow_heap_node< T, K >* u = new hollow_heap_node< T, K >();
     u->item = item;
     u->child = nullptr;
