@@ -10,14 +10,16 @@
 using namespace std;
 using namespace std::chrono;
 
+const int N = 10000;
+
 vector<int> dijkstras_pq( vector< vector< int > > adjL ) {
     auto cmp = [](pair<int, int> lhs, pair<int,int> rhs ) {
         return lhs.first > rhs.first;
     };
     priority_queue< pair< int, int >, vector< pair< int, int > >, decltype(cmp) > q(cmp);
-    vector< bool > vis( 10000, false );
-    vector< int > dist( 10000, numeric_limits<int>::max() );
-    vector< int > prev( 10000, -1 );
+    vector< bool > vis( N, false );
+    vector< int > dist( N, numeric_limits<int>::max() );
+    vector< int > prev( N, -1 );
 
     dist[0] = 0;
     q.push( make_pair( 0, 0 ) );
@@ -28,7 +30,7 @@ vector<int> dijkstras_pq( vector< vector< int > > adjL ) {
 
         if ( vis[cur] ) continue;
 
-        for( int i = 0; i < 10000; i++ ) {
+        for( int i = 0; i < N; i++ ) {
             if ( vis[i] ) continue;
             if ( i == cur ) continue;
             if ( dist[cur] + adjL[cur][i] < dist[i] ) {
@@ -44,9 +46,9 @@ vector<int> dijkstras_pq( vector< vector< int > > adjL ) {
 
 vector< int > dijkstras_hh ( vector< vector< int > > adjL ) {
     hollow_heap< int, int > h = hollow_heap< int, int >();
-    vector< bool > vis( 10000, false );
-    vector< int > dist( 10000, numeric_limits<int>::max() );
-    vector< int > prev( 10000, -1 );
+    vector< bool > vis( N, false );
+    vector< int > dist( N, numeric_limits<int>::max() );
+    vector< int > prev( N, -1 );
 
     dist[0] = 0;
     h.insert( 0, 0 );
@@ -57,7 +59,7 @@ vector< int > dijkstras_hh ( vector< vector< int > > adjL ) {
 
         if ( vis[cur] ) continue;
 
-        for( int i = 0; i < 10000; i++ ) {
+        for( int i = 0; i < N; i++ ) {
             if ( vis[i] ) continue;
             if ( i == cur ) continue;
             if ( dist[cur] + adjL[cur][i] < dist[i] ) {
@@ -75,9 +77,9 @@ vector< int > dijkstras_hh ( vector< vector< int > > adjL ) {
 int main() {
     vector< vector< int > > adjL;
 
-    for ( int i = 0; i < 10000; i++ ) {
+    for ( int i = 0; i < N; i++ ) {
         adjL.push_back( vector<int>() );
-        for ( int j = 0; j < 10000; j++ ) {
+        for ( int j = 0; j < N; j++ ) {
             adjL[i].push_back( 1 + rand()%100000 );
         }
     }
@@ -96,7 +98,7 @@ int main() {
     duration< double, milli > duration_hh = end2 - start2;
     cout << "The time to run Dijkstra's on K_10000 with hollow heap: " 
         << duration_hh.count() << " ms" << endl;
-    cout << "Hollow Heap runs " << duration_hh.count() / duration_pq.count()
+    cout << "Hollow Heap runs " << duration_pq.count() / duration_hh.count()
         << " times faster than the Priority Queue version." << endl;
     
     long long cst1 = 0;
